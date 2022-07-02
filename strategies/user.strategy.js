@@ -1,14 +1,14 @@
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const encryptLib = require('../modules/encryption');
-const pool = require('../modules/pool');
+const db = require('../db');
 
 passport.serializeUser((user, done) => {
   done(null, user.id);
 });
 
 passport.deserializeUser((id, done) => {
-  pool
+  db
     .query('SELECT * FROM "users" WHERE id = $1', [id])
     .then((result) => {
       // Handle Errors
@@ -38,7 +38,7 @@ passport.deserializeUser((id, done) => {
 passport.use(
   'local',
   new LocalStrategy((username, password, done) => {
-    pool
+    db
       .query('SELECT * FROM "users" WHERE username = $1', [username])
       .then((result) => {
         const user = result && result.rows && result.rows[0];
